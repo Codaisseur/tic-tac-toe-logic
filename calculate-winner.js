@@ -1,19 +1,53 @@
 // calculate-winner.js
 
-const calculateWinner = (board) => rowWinnerBoard(board) || columnWinnerBoard(board) || diagonalWinner(board)
+function calculateWinner_notClean(rows) {
+    const winningRow = rows.find(allSymbolsAreTheSameButNotNull)
+    if (winningRow) {
+        return winningRow[0]
+    }
+    const columns = getColumns(rows)
+    const winningColumn = columns.find(allSymbolsAreTheSameButNotNull)
+    if (winningColumn) {
+        return winningColumn[0]
+    }
+    const diagonals = getDiagonals(rows)
+    const winningDiagonal = diagonals.find(allSymbolsAreTheSameButNotNull)
+    if (winningDiagonal) {
+        return winningDiagonal[0]
+    }
+    return null
+}
 
-const rowWinnerBoard = (board) => board.map(rowWinner).find(winner => winner !== null) || null
+function calculateWinner_noDuplication(rows) {
+    const allDirections = rows.concat(getColumns(rows)).concat(getDiagonals(rows))
+    const winningDirection = allDirections.find(allSymbolsAreTheSameButNotNull)
+    if (winningDirection) {
+        return winningDirection[0]
+    }
+    return null
+}
 
-const rowWinner = (row) => row.reduce(winningSymbol)
 
-const winningSymbol = (winSymbol, symbol) => winSymbol === symbol ? symbol : null
+function getColumns(rows) {
+    return [
+        [rows[0][0], rows[1][0], rows[2][0]],
+        [rows[0][1], rows[1][1], rows[2][1]],
+        [rows[0][2], rows[1][2], rows[2][2]],
+    ]
+}
 
-const onTheSide = (board) => [0, 1, 2].map(n => board.map(row => row[n]))
+function getDiagonals(rows) {
+    return [
+        [rows[0][0], rows[1][1], rows[2][2]],
+        [rows[0][2], rows[1][1], rows[2][0]],
+    ]
+}
 
-const columnWinnerBoard = (board) => rowWinnerBoard(onTheSide(board))
-
-const diagonalWinner = (board) => [0, 1, 2].map(n => board[n][n]).reduce(winningSymbol) || [0, 1, 2].map(n => board[2-n][n]).reduce(winningSymbol)
+function allSymbolsAreTheSameButNotNull(symbols) {
+    const first = symbols[0]
+    return symbols.every(s => s === first && s !== null)
+}
 
 module.exports = {
-    calculateWinner
+    calculateWinner: calculateWinner_noDuplication
 }
