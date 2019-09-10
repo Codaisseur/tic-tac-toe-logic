@@ -27,10 +27,7 @@ function allSymbolsAsOneArray(rows) {
 
 function changeCount(from, to) {
     const allPairs = getTransitionPairs(from, to)
-    const changes = allPairs.filter(pair => {
-        const [from, to] = pair
-        return from !== to
-    })
+    const changes = allPairs.filter(pair => pair[0] !== pair[1])
     return changes.length
 }
 
