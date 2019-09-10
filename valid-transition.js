@@ -1,19 +1,50 @@
-const isValidTransition = (from, to) => pastMovesRemain(from, to) && turnIsRespected(to) && changeCount(from, to) === 1
+function isValidTransition(from, to) {
+    return pastMovesRemain(from, to) &&
+        turnIsRespected(to) &&
+        changeCount(from, to) === 1
+}
 
-const pastMovesRemain = (from, to) => from.every((fromRow, i) => pastMoveRemainsInRow(fromRow, to[i]))
+function pastMovesRemain(from, to) {
+    const allPairs = getTransitionPairs(from, to)
+    return allPairs.every(pair => {
+        const [from, to] = pair
+        if (from === null) {
+            return true
+        }
+        return from === to
+    })
+}
 
-const pastMoveRemainsInRow = (fromRow, toRow) => fromRow.every((symbol, i) => symbol === null || symbol === toRow[i])
+function getTransitionPairs(from, to) {
+    const fromSymbols = allSymbolsAsOneArray(from)
+    const toSymbols = allSymbolsAsOneArray(to)
+    return fromSymbols.map((_, index) => [fromSymbols[index], toSymbols[index]])
+}
 
-const changeCount = (from, to) => from.map((fromRow, i) => changeCountRow(fromRow, to[i])).reduce(sumReducer)
+function allSymbolsAsOneArray(rows) {
+    return rows[0].concat(rows[1]).concat(rows[2])
+}
 
-const changeCountRow = (fromRow, toRow) => fromRow.map((symbol, i) => symbol === toRow[i] ? 0 : 1).reduce(sumReducer)
+function changeCount(from, to) {
+    const allPairs = getTransitionPairs(from, to)
+    const changes = allPairs.filter(pair => {
+        const [from, to] = pair
+        return from !== to
+    })
+    return changes.length
+}
 
-const turnIsRespected = (board) => isBetween(count(board, 'x') - count(board, 'o'), 0, 1)
+function turnIsRespected(board) {
+    const numMovesO = countSymbol(board, 'o')
+    const numMovesX = countSymbol(board, 'x')
+    const timesXPlayedMoreThanO = numMovesX - numMovesO
+    return timesXPlayedMoreThanO >= 0 && timesXPlayedMoreThanO <= 1
+}
 
-const isBetween = (num, minInclusive, maxInclusive) => num >= minInclusive && num <= maxInclusive
+function countSymbol(board, target) {
+    const symbols = allSymbolsAsOneArray(board)
+    return symbols.filter(symbol => symbol === target).length
+}
 
-const count = (board, target) => board.map(row => row.filter(symbol => symbol === target).length).reduce(sumReducer)
 
-const sumReducer = (sum, count) => sum + count
-
-module.exports = {isValidTransition, turnIsRespected, changeCount}
+module.exports = { isValidTransition, turnIsRespected, changeCount }
