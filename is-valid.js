@@ -1,11 +1,17 @@
 // is-valid.js
 
-const symbols = [ 'x', 'o', null ]
+const validSymbols = [ 'x', 'o', null ]
 
-const isValidBoard = (board) => board.length === 3 && board.every(isValidRow)
+function isValidBoard(rows) {
+    return rows.length === 3 && rows.every(rowIsValid)
+}
 
-const isValidRow = (row) => row.length === 3 && row.every(isValidSymbol)
+function rowIsValid(cels) {
+    return cels.length === 3 && cels.every(symbolIsValid)
+}
 
-const isValidSymbol = (s) => symbols.includes(s)
+function symbolIsValid(s) {
+    return validSymbols.includes(s)
+}
 
 module.exports = { isValidBoard }
